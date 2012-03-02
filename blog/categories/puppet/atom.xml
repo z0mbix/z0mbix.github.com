@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: puppet | z0mbix's Memory Dump]]></title>
+  <link href="http://z0mbix.github.com/blog/categories/puppet/atom.xml" rel="self"/>
+  <link href="http://z0mbix.github.com/"/>
+  <updated>2012-03-02T12:11:25+00:00</updated>
+  <id>http://z0mbix.github.com/</id>
+  <author>
+    <name><![CDATA[z0mbix]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Nginx and Passenger to power your puppet master]]></title>
+    <link href="http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/"/>
+    <updated>2012-03-01T11:17:00+00:00</updated>
+    <id>http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master</id>
+    <content type="html"><![CDATA[<p>Where I work, we use <a href="http://nginx.org/">Nginx</a> wherever possible, so when it came to setting up a new Puppet Master I headed to the puppet docs only to find outdated docs on doing this. Most docs are centred around using Apache with <a href="http://www.modrails.com/">Passenger</a>. After much Googling, I found that not many people are doing this, or if they are, they haven't documented it. This post documents the steps required to get this all running, and is based around doing so using RHEL or CentOS 5.x.</p>
+
+<p>The version of Ruby that is included with Red Hat/CentOS 5.x is ancient, and should not be used. You should start with at least Ruby 1.8.7 (Plus Rubygems) or 1.9.2. See the <a href="http://docs.puppetlabs.com/guides/faq.html">Puppet Labs FAQ</a> for details on the best version to use.I recommend you use the <a href="http://frameos.org/">FrameOS</a> repo that provides Ruby 1.8.7:
+```</p>
+
+<h1>rpm -Uvh http://rbel.frameos.org/rbel5</h1>
+
+<p>```</p>
+
+<p>Install Ruby and Rubygems:
+```</p>
+
+<h1>yum install -y ruby rubygems ruby-devel.x86_64</h1>
+
+<p>```</p>
+
+<p>Now that's out the way, let's install puppet and puppet-server from <a href="http://yum.puppetlabs.com/">yum.puppetlabs.com</a>. You need to add the Puppet Labs yum repo which creates the file <strong>/etc/yum.repos.d/puppetlabs.repo</strong> file:
+```</p>
+
+<h1>rpm -ivh http://yum.puppetlabs.com/el/5/products/x86_64/puppetlabs-release-5-1.noarch.rpm</h1>
+
+<p>```</p>
+
+<p>Now install Puppet:
+```</p>
+
+<h1>yum install -y puppet puppet-server</h1>
+
+<p>```</p>
+
+<p>Install some dependency requirements to compile nginx:
+```</p>
+
+<h1>yum install -y gcc make pcre-devel zlib-devel openssl-devel pam-devel curl-devel rpm-build</h1>
+
+<p>```</p>
+
+<p>You'll probably want git at some stage too, so it's easiest to add the <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> repository and get it from there.</p>
+
+<p>Install rake, rack and passenger ruby gems:
+```</p>
+
+<h1>gem install rake rack passenger --no-rdoc --no-ri</h1>
+
+<p>```</p>
+
+<p>As nginx does not support dynamic module loading like Apache, and the official nginx
+RPMs provided by nginx.org are not compiled with Passenger suppport, we need to build
+nginx from source. I am not using the modrails.com <a href="http://www.modrails.com/install.html">yum repo</a> to install the passenger enabled nginx as it relies on the default Ruby 1.8.5 and I don't wish to use such an old version of Ruby. I'm also not using 1.9.2 as the Puppet Labs puppet packages are dependant on Ruby 1.8.x. If you wish to use Ruby 1.9.x, just install puppet as a gem (gem install puppet). This doesn't setup the puppet user or install the RHEL/CentOS init script.</p>
+
+<p>Download nginx <a href="http://nginx.org/en/download.html">latest stable source</a> (Currently <a href="http://nginx.org/download/nginx-1.0.12.tar.gz">v1.0.12</a>):
+```</p>
+
+<h1>wget http://nginx.org/download/nginx-1.0.12.tar.gz</h1>
+
+<p>```</p>
+
+<p>Unpack it and move into the new directory:
+```</p>
+
+<h1>tar xvzf nginx-1.0.12.tar.gz</h1>
+
+<h1>cd nginx-1.0.12</h1>
+
+<p>```</p>
+
+<p>Configure nginx, and add the passenger module:
+```</p>
+
+<h1>./configure \</h1>
+
+<pre><code>  --prefix=/opt/nginx \
+  --conf-path=/etc/nginx/nginx.conf \
+  --pid-path=/var/run/nginx.pid \
+  --error-log-path=/var/log/nginx/error.log \
+  --http-log-path=/var/log/nginx/access.log \
+  --with-http_ssl_module \
+  --with-http_gzip_static_module \
+  --add-module=`passenger-config --root`/ext/nginx
+</code></pre>
+
+<p>```</p>
+
+<p>This should end up with something similar to:
+```
+configuring additional modules
+adding module in /usr/lib/ruby/gems/1.8/gems/passenger-3.0.11/ext/nginx
+checking for Math library ... found
+ + ngx_http_passenger_module was configured
+checking for PCRE library ... found
+checking for OpenSSL library ... found
+checking for zlib library ... found
+creating objs/Makefile</p>
+
+<p>Configuration summary
+  + using system PCRE library
+  + using system OpenSSL library
+  + md5: using OpenSSL library
+  + sha1: using OpenSSL library
+  + using system zlib library</p>
+
+<p>  nginx path prefix: "/opt/nginx"
+  nginx binary file: "/opt/nginx/sbin/nginx"
+  nginx configuration prefix: "/etc/nginx"
+  nginx configuration file: "/etc/nginx/nginx.conf"
+  nginx pid file: "/var/run/nginx.pid"
+  nginx error log file: "/var/log/nginx/error.log"
+  nginx http access log file: "/var/log/nginx/access.log"
+  nginx http client request body temporary files: "client_body_temp"
+  nginx http proxy temporary files: "proxy_temp"
+  nginx http fastcgi temporary files: "fastcgi_temp"
+  nginx http uwsgi temporary files: "uwsgi_temp"
+  nginx http scgi temporary files: "scgi_temp"
+```</p>
+
+<p>It's a good idea to build a RPM for nginx so you can quickly deploy it to other pupper servers.
+To do this I'm going to use <a href="http://www.semicomplete.com/">Jordan Sissel's</a> superb <a href="https://github.com/jordansissel/fpm">fpm</a>.</p>
+
+<p>Let's install the fpm rubygem:</p>
+
+<p>```</p>
+
+<h1>gem install fpm --no-rdoc --no-ri</h1>
+
+<p>```</p>
+
+<p>Create a temporary location to create the RPM package:</p>
+
+<p>```</p>
+
+<h1>mkdir /tmp/installdir</h1>
+
+<h1>make</h1>
+
+<h1>make install DESTDIR=/tmp/installdir</h1>
+
+<p>```</p>
+
+<p>Make some additional directories to add extra files to the RPM we are about to build:
+```</p>
+
+<h1>mkdir -p /tmp/installdir/etc/{sysconfig,rc.d/init.d,nginx/conf.d}</h1>
+
+<p>```</p>
+
+<p>Next, you need an nginx init script. I created one based on the <a href="http://wiki.nginx.org/index.php?title=RedHatNginxInitScript&amp;action=raw&amp;anchor=nginx">one from the nginx wiki</a> and updated it with correct paths and removed the auto user creation stuff. I won't paste the whole thing here, but you can download it (and all the other files) from my <a href="https://github.com/z0mbix/puppet-master-nginx-passenger">GitHub repo</a>:
+```</p>
+
+<h1>curl -L https://raw.github.com/z0mbix/puppet-master-nginx-passenger/master/etc/rc.d/init.d/nginx -o /tmp/installdir/etc/rc.d/init.d/nginx</h1>
+
+<p>```</p>
+
+<p>Make it executable:
+```</p>
+
+<h1>chmod 755 /tmp/installdir/etc/rc.d/init.d/nginx</h1>
+
+<p>```</p>
+
+<p>Create the nginx sysconfig file <strong>/tmp/installdir/etc/sysconfig/nginx</strong> containing:
+```</p>
+
+<h1>Configuration file for the nginx service.</h1>
+
+<p>NGINX=/opt/nginx/sbin/nginx
+CONFFILE=/etc/nginx/nginx.conf
+LOCKFILE=/var/lock/subsys/nginx
+```</p>
+
+<p>Make it executable:
+```</p>
+
+<h1>chmod 755 /tmp/installdir/etc/sysconfig/nginx</h1>
+
+<p>```</p>
+
+<p>Go home:
+```</p>
+
+<h1>cd ~</h1>
+
+<p>```</p>
+
+<p>Create the RPM package:
+```</p>
+
+<h1>fpm -s dir \</h1>
+
+<p>  -t rpm \
+  -n nginx-passenger \
+  -v 1.0.12 \
+  -C /tmp/installdir \
+  -m "David Wooldridge <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#x7a;&#x6f;&#109;&#x62;&#x69;&#101;&#64;&#x7a;&#x6f;&#x6d;&#x62;&#x69;&#120;&#46;&#x6f;&#114;&#x67;">&#122;&#111;&#x6d;&#x62;&#x69;&#x65;&#64;&#122;&#111;&#x6d;&#x62;&#x69;&#x78;&#x2e;&#111;&#114;&#x67;</a>" \
+  --url "http://nginx.org/" \
+  --description "Nginx with the passenger module"
+```</p>
+
+<p>This should drop a nice new RPM in cwd called <strong>nginx-passenger-1.0.12-1.x86_64.rpm</strong>.</p>
+
+<p>You can now install the RPM:
+```</p>
+
+<h1>rpm -ivh nginx-passenger-1.0.12-1.x86_64.rpm</h1>
+
+<p>Preparing...                ########################################### [100%]
+   1:nginx-passenger        ########################################### [100%]
+```</p>
+
+<p>Create rack directory structure:
+```</p>
+
+<h1>mkdir -p /etc/puppet/rack/public</h1>
+
+<p>```</p>
+
+<p>Copy rackup file to the correct place:
+```</p>
+
+<h1>cp /usr/share/puppet/ext/rack/files/config.ru /etc/puppet/rack/</h1>
+
+<p>```</p>
+
+<p>Set the correct permissions, <strong>this is important</strong>:
+```</p>
+
+<h1>chown -R puppet:puppet /etc/puppet/rack/</h1>
+
+<p>```</p>
+
+<p>Create the main nginx configuration file <strong>/etc/nginx/nginx.conf</strong>:
+```
+user  nginx;
+worker_processes  1;</p>
+
+<p>error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;</p>
+
+<p>events {</p>
+
+<pre><code>worker_connections  1024;
+</code></pre>
+
+<p>}</p>
+
+<p>http {</p>
+
+<pre><code>include       /etc/nginx/mime.types;
+default_type  application/octet-stream;
+
+log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                  '$status $body_bytes_sent "$http_referer" '
+                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+access_log  /var/log/nginx/access.log  main;
+
+sendfile        on;
+tcp_nopush      on;
+
+keepalive_timeout  65;
+
+# Passenger needed for puppet
+passenger_root  /usr/lib/ruby/gems/1.8/gems/passenger-3.0.11;
+passenger_ruby  /usr/bin/ruby;
+passenger_max_pool_size 15;
+
+include /etc/nginx/conf.d/*.conf;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Make sure the <em>passenger_root</em> is set to whatever is returned by:
+```</p>
+
+<h1>passenger-config --root</h1>
+
+<p>```</p>
+
+<p>The passenger configuration is taken from the <em>Suggested Tweaks</em> section of the Puppet Labs Apache/Passenger document found <a href="http://docs.puppetlabs.com/guides/passenger.html">here</a> and adapted for Nginx using the Passenger Nginx user guide found <a href="http://www.modrails.com/documentation/Users%20guide%20Nginx.html">here</a>. The defaults are all acceptable apart from <em>passenger_max_pool_size</em> which by default is only <em>6</em>. This sets the maximum number of rack application instances that can be simultaneously active. I'm presuming you won't be running your puppet master on less than 1GB of RAM, so setting this to 15. Adjust this to suit your hardware/RAM.</p>
+
+<p>Also, if you have installed Ruby any where else, update <em>passenger_ruby</em>. Feel free to update <em>worker_processes</em> for your hardware.</p>
+
+<p>Create the nginx puppet server config <strong>/etc/nginx/conf.d/puppet.conf</strong>:</p>
+
+<p>```
+server {</p>
+
+<pre><code>listen                     8140 ssl;
+server_name                puppet puppet.example.com;
+
+passenger_enabled          on;
+passenger_set_cgi_param    HTTP_X_CLIENT_DN $ssl_client_s_dn; 
+passenger_set_cgi_param    HTTP_X_CLIENT_VERIFY $ssl_client_verify; 
+
+access_log                 /var/log/nginx/puppet_access.log;
+error_log                  /var/log/nginx/puppet_error.log;
+
+root                       /etc/puppet/rack/public;
+
+ssl_certificate            /etc/puppet/ssl/certs/puppet.example.com.pem;
+ssl_certificate_key        /etc/puppet/ssl/private_keys/puppet.example.com.pem;
+ssl_crl                    /etc/puppet/ssl/ca/ca_crl.pem;
+ssl_client_certificate     /etc/puppet/ssl/certs/ca.pem;
+ssl_ciphers                SSLv2:-LOW:-EXPORT:RC4+RSA;
+ssl_prefer_server_ciphers  on;
+ssl_verify_client          optional;
+ssl_verify_depth           1;
+ssl_session_cache          shared:SSL:128m;
+ssl_session_timeout        5m;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Create the puppet configuration file <strong>/etc/puppet/puppet.conf</strong>:
+```
+[main]</p>
+
+<p>[agent]
+  server = puppet.example.com</p>
+
+<p>[master]
+  certname = puppet.example.com
+```</p>
+
+<p>Turn puppet master off as it doesn't need to run standalone:
+```</p>
+
+<h1>chkconfig puppetmaster off</h1>
+
+<p>```</p>
+
+<p>Run a stand-alone puppet master to generate/sign certs etc.
+```</p>
+
+<h1>puppet master --no-daemonize --verbose</h1>
+
+<p>info: Creating a new SSL key for puppet.example.com
+info: Creating a new SSL certificate request for puppet.example.com
+info: Certificate Request fingerprint (md5): 04:AA:81:9E:49:B9:CA:2B:FD:D0:32:1B:69:CC:3E:B4
+notice: puppet.example.com has a waiting certificate request
+notice: Signed certificate request for puppet.example.com
+notice: Removing file Puppet::SSL::CertificateRequest puppet.example.com at '/etc/puppet/ssl/ca/requests/puppet.example.com.pem'
+notice: Removing file Puppet::SSL::CertificateRequest puppet.example.com at '/etc/puppet/ssl/certificate_requests/puppet.example.com.pem'
+notice: Starting Puppet master version 2.7.11
+```</p>
+
+<p>Hit Ctrl+c to stop the stand-alone puppet master. You can see above that this has created a SSL key and certificate request, then signed this certificate request.</p>
+
+<p>Add an nginx user:
+```</p>
+
+<h1>adduser nginx</h1>
+
+<p>```</p>
+
+<p>Enable nginx
+```</p>
+
+<h1>chkconfig nginx on</h1>
+
+<p>```</p>
+
+<p>Make sure everything looks good:
+```</p>
+
+<h1>service nginx configtest</h1>
+
+<p>```</p>
+
+<p>If so, away you go:
+```</p>
+
+<h1>service nginx start</h1>
+
+<p>```</p>
+
+<p>Now test a puppet agent run on the master:</p>
+
+<p>```</p>
+
+<h1>puppet agent --server puppet --onetime --no-daemonize --verbose --noop</h1>
+
+<p>info: Caching catalog for puppet.example.com
+info: Applying configuration version '1330615281'
+notice: Finished catalog run in 0.04 seconds
+```</p>
+
+<p>One drawback of using nginx and passenger to front your Puppet master is that when there is a passenger upgrade, you will need to recompile nginx against the new passenger version and build a new RPM. Fortunately, because you are now running puppet and have been converted to <a href="https://github.com/jordansissel/fpm">fpm</a>, this should be a trivial task, and not something you will need to do very often.</p>
+
+<p>Let me know how you get on: <a href="https://twitter.com/#!/z0mbix">@z0mbix</a></p>
+]]></content>
+  </entry>
+  
+</feed>

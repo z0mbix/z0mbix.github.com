@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>z0mbix's Memory Dump</title>
+  <title>Using Nginx and Passenger to power your puppet master - z0mbix's Memory Dump</title>
   <meta name="author" content="z0mbix">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://z0mbix.github.com">
+  <link rel="canonical" href="http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/">Using Nginx and Passenger to Power Your Puppet Master</a></h1>
+      <h1 class="entry-title">Using Nginx and Passenger to Power Your Puppet Master</h1>
     
     
       <p class="meta">
@@ -93,7 +90,7 @@
   </header>
 
 
-  <div class="entry-content"><p>Where I work, we use <a href="http://nginx.org/">Nginx</a> wherever possible, so when it came to setting up a new Puppet Master I headed to the puppet docs only to find outdated docs on doing this. Most docs are centred around using Apache with <a href="http://www.modrails.com/">Passenger</a>. After much Googling, I found that not many people are doing this, or if they are, they haven&#8217;t documented it. This post documents the steps required to get this all running, and is based around doing so using RHEL or CentOS 5.x.</p>
+<div class="entry-content"><p>Where I work, we use <a href="http://nginx.org/">Nginx</a> wherever possible, so when it came to setting up a new Puppet Master I headed to the puppet docs only to find outdated docs on doing this. Most docs are centred around using Apache with <a href="http://www.modrails.com/">Passenger</a>. After much Googling, I found that not many people are doing this, or if they are, they haven&#8217;t documented it. This post documents the steps required to get this all running, and is based around doing so using RHEL or CentOS 5.x.</p>
 
 <p>The version of Ruby that is included with Red Hat/CentOS 5.x is ancient, and should not be used. You should start with at least Ruby 1.8.7 (Plus Rubygems) or 1.9.2. See the <a href="http://docs.puppetlabs.com/guides/faq.html">Puppet Labs FAQ</a> for details on the best version to use.I recommend you use the <a href="http://frameos.org/">FrameOS</a> repo that provides Ruby 1.8.7:</p>
 
@@ -562,18 +559,63 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
 
 <p>Let me know how you get on: <a href="https://twitter.com/#!/z0mbix">@z0mbix</a></p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">z0mbix</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2012-03-01T11:17:00+00:00" pubdate data-updated="true">Mar 1<span>st</span>, 2012</time>
+      
+
+<span class="categories">
   
-  <div class="pagination">
+    <a class='category' href='/blog/categories/centos/'>centos</a>, <a class='category' href='/blog/categories/fpm/'>fpm</a>, <a class='category' href='/blog/categories/nginx/'>nginx</a>, <a class='category' href='/blog/categories/passenger/'>passenger</a>, <a class='category' href='/blog/categories/puppet/'>puppet</a>, <a class='category' href='/blog/categories/redhat/'>redhat</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+    </p>
     
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/" data-via="z0mbix" data-counturl="http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/" >Tweet</a>
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -590,7 +632,7 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/z0mbix">@z0mbix</a> on GitHub
@@ -620,7 +662,7 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -647,6 +689,7 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -661,7 +704,10 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
       var disqus_shortname = 'z0mbix';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/';
+        var disqus_url = 'http://z0mbix.github.com/blog/2012/03/01/use-nginx-and-passenger-to-power-your-puppet-master/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
