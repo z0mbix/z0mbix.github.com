@@ -301,6 +301,7 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'># fpm -s dir \
 </span><span class='line'>  -t rpm \
 </span><span class='line'>  -n nginx-passenger \
@@ -308,7 +309,8 @@ To do this I&#8217;m going to use <a href="http://www.semicomplete.com/">Jordan 
 </span><span class='line'>  -C /tmp/installdir \
 </span><span class='line'>  -m "David Wooldridge &lt;zombie@zombix.org&gt;" \
 </span><span class='line'>  --url "http://nginx.org/" \
-</span><span class='line'>  --description "Nginx with the passenger module"</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>  --description "Nginx with the passenger module" \
+</span><span class='line'>  etc opt var</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This should drop a nice new RPM in cwd called <strong>nginx-passenger-1.0.12-1.x86_64.rpm</strong>.</p>

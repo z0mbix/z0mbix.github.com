@@ -4,7 +4,7 @@
   <title><![CDATA[Category: passenger | z0mbix's Memory Dump]]></title>
   <link href="http://z0mbix.github.com/blog/categories/passenger/atom.xml" rel="self"/>
   <link href="http://z0mbix.github.com/"/>
-  <updated>2012-03-02T12:11:25+00:00</updated>
+  <updated>2012-03-25T23:11:21+01:00</updated>
   <id>http://z0mbix.github.com/</id>
   <author>
     <name><![CDATA[z0mbix]]></name>
@@ -210,9 +210,10 @@ LOCKFILE=/var/lock/subsys/nginx
   -n nginx-passenger \
   -v 1.0.12 \
   -C /tmp/installdir \
-  -m "David Wooldridge <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#122;&#x6f;&#109;&#x62;&#105;&#x65;&#x40;&#x7a;&#x6f;&#x6d;&#98;&#x69;&#120;&#46;&#x6f;&#114;&#x67;">&#122;&#x6f;&#109;&#98;&#105;&#x65;&#x40;&#122;&#111;&#109;&#x62;&#105;&#120;&#x2e;&#111;&#x72;&#x67;</a>" \
+  -m "David Wooldridge <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#x7a;&#x6f;&#109;&#x62;&#x69;&#x65;&#64;&#x7a;&#111;&#109;&#98;&#x69;&#x78;&#x2e;&#111;&#x72;&#x67;">&#x7a;&#x6f;&#109;&#98;&#105;&#101;&#x40;&#x7a;&#111;&#109;&#x62;&#x69;&#x78;&#x2e;&#111;&#114;&#x67;</a>" \
   --url "http://nginx.org/" \
-  --description "Nginx with the passenger module"
+  --description "Nginx with the passenger module" \
+  etc opt var
 ```</p>
 
 <p>This should drop a nice new RPM in cwd called <strong>nginx-passenger-1.0.12-1.x86_64.rpm</strong>.</p>
